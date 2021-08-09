@@ -1,0 +1,11 @@
+div {
+	height: 300px;
+	width: 300px;
+	overflow: auto;
+}
+
+svg {
+	width: 500px;
+	height: 500px;
+	border:  1px solid blue;
+}
