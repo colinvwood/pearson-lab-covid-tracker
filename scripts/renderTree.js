@@ -1,6 +1,6 @@
-const parseNewickFile = require('./readNewick');
+import { parseNewickFile } from "./parseNewickFile.js";
 
-async function renderTree() {
+export async function renderTree() {
 	let treeData = await parseNewickFile();
 
 	// temporary assumptions: branch lengths present, no non-leaf node labels,
@@ -15,7 +15,8 @@ async function renderTree() {
 	// find height (y-coordinate) of each leaf node
 	let leafNodeContainerHeight = 100 / treeData.numLeafNodes;
 
+	//var tree = SVG().addTo('svg');
+	//tree.path('M 10 10 V 25').attr({'stroke-width:': 10, 'stroke': '#000'});
+
 	console.log(leafNodeContainerHeight);
 }
-
-renderTree();

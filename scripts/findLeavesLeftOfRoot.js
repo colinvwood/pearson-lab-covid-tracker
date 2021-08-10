@@ -1,4 +1,4 @@
-function findLeavesLeftOfRoot(newickString) {
+export function findLeavesLeftOfRoot(newickString) {
 
 	let numLeavesLeftOfRoot;
 
@@ -29,5 +29,3 @@ function findLeavesLeftOfRoot(newickString) {
 
 	return numLeavesLeftOfRoot;
 }
-
-module.exports = findLeavesLeftOfRoot;

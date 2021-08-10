@@ -4,7 +4,16 @@
   </head>
   <body>
 
+    
+    <svg viewBox="0 0 100 100"></svg>
+
+    <form method="post" action="/file" enctype="multipart/form-data">
+      <label for="newickfile">Upload newick file</label>
+      <input type="file" name="newickfile">
+      <input type="submit" value="submit">
+    </form>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.1.1/svg.min.js"></script>
-	  <script src="javascript/app.js"></script>
+	  <script type="module" src="scripts/app.js"></script>
   </body>
 </html>

@@ -1,22 +1,10 @@
-const fs = require('fs');
-const findLeavesLeftOfRoot = require('./findLeavesLeftOfRoot');
+import { findLeavesLeftOfRoot } from "./findLeavesLeftOfRoot.js";
 
-function readNewickFile(fileName) {
-	return new Promise(function (resolve, reject) {
-		fs.readFile(fileName, 'utf-8', function(err, data) {
-			if (err) {
-				reject(err);
-			} 
-			else {
-				resolve(data);
-			}
-		});
-	});
-}
+const data = Deno.readTextFile("./../all.nwk");
 
-async function parseNewickFile() {
+export async function parseNewickFile() {
 	try {
-		let newickString = await readNewickFile('./../all.nwk');
+		let newickString = await data;
 
 		// remove newline characters and spaces if present
 		newickString = newickString.split('\n').join('');
@@ -51,10 +39,4 @@ async function parseNewickFile() {
 	catch (error) {
 		console.log('Error reading newick file.');
 	}
-	
-
 }
-
-module.exports = parseNewickFile;
-
-
