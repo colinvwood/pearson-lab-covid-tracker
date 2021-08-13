@@ -1,10 +1,10 @@
-export function findLeavesLeftOfRoot(newickString) {
+export function findLeavesLeftOfRoot(newickString, startIndex) {
 
 	let numLeavesLeftOfRoot;
 
 	let openeningParenCounter = 0, closingParenCounter = 0;
 	let leftSubStr = '';
-	for (let i=1; i<newickString.length; i++) {
+	for (let i=startIndex; i<newickString.length; i++) {
 		if (i == 1 && newickString.charAt(i) != '(') {
 			numLeavesLeftOfRoot = 1;
 			break;

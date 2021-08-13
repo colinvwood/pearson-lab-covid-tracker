@@ -1,7 +1,10 @@
-import { parseNewickFile } from "./parseNewickFile.js";
+import { parseNewickFile, getNextNode } from "./parseNewickFile.js";
+import { findLeavesLeftOfRoot } from "./findLeavesLeftOfRoot.js";
 
-export async function renderTree() {
-	let treeData = await parseNewickFile();
+export async function renderTree(newickString) {
+
+	// parse newick string retrieved from uploaded file
+	let treeData = await parseNewickFile(newickString);
 
 	// temporary assumptions: branch lengths present, no non-leaf node labels,
 	// no polytomy
@@ -10,13 +13,20 @@ export async function renderTree() {
 	}
 
 	// find svg start position for y-coordinate given 100 x 100 viewPort
-	let startYPosition = (treeData.numLeavesLeftOfRoot / treeData.numLeafNodes) * 100;
+	let startYPosition = (findLeavesLeftOfRoot(newickString, 1) / treeData.numLeafNodes) * 100;
 
 	// find height (y-coordinate) of each leaf node
 	let leafNodeContainerHeight = 100 / treeData.numLeafNodes;
 
-	//var tree = SVG().addTo('svg');
-	//tree.path('M 10 10 V 25').attr({'stroke-width:': 10, 'stroke': '#000'});
+	console.log(startYPosition);
 
-	console.log(leafNodeContainerHeight);
+	let x = getNextNode(newickString, 22);
+	console.log(x);
+	
+	var tree = SVG().addTo('.svg-container');
+	tree.viewbox(0, 0, 100, 100);
+
+	
+	tree.path('M 10 10 V 25').attr({'stroke-width:': 2, 'stroke': '#000'});
+
 }

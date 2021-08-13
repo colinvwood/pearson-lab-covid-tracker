@@ -15,19 +15,28 @@ for await (const req of server) {
       body: decoder.decode(renderFile)
     });
   }
-  if (req.url == '/file' && req.method == 'POST') {
+  if (req.url == '/upload' && req.method == 'POST') {
     const form = await multiParser(req);
     const newickString = decoder.decode(form.files.newickfile.content);
     const fileWritePromise = Deno.writeTextFile("./tree.nwk", newickString);
     req.respond({
+      status: 303,
       headers: new Headers({
-        'content-type': 'text/html'
-      }),
-      body: "thx for the file"
+        location: "/"
+      })
     });
   }
-  
-  if (req.url == '/stylesheets/app.css') {
+  if (req.url == '/tree.nwk') {
+    renderFile = await Deno.readFile('./tree.nwk');
+    req.respond({
+      headers: new Headers({
+        'content-type': 'text/plain'
+      }),
+      body: decoder.decode(renderFile)
+    });
+  }
+  if (req.url.includes('/stylesheets/')) {
+    let filename = './' + req.url.substr(1, req.url.length);
     renderFile = await Deno.readFile('./stylesheets/app.css');
     req.respond({
       headers: new Headers({
@@ -36,8 +45,9 @@ for await (const req of server) {
       body: decoder.decode(renderFile)
     });
   }
-  if (req.url == '/scripts/app.js') {
-    renderFile = await Deno.readFile('./scripts/app.js');
+  if (req.url.includes('/scripts/')) {
+    let filename = './' + req.url.substr(1, req.url.length);
+    renderFile = await Deno.readFile(filename);
     req.respond({
       headers: new Headers({
         'content-type': 'application/javascript'
@@ -45,5 +55,12 @@ for await (const req of server) {
       body: decoder.decode(renderFile)
     });
   }
+  /*
+  else {
+    req.respond({
+      body: "Bad fetch..."
+    });
+  }
+  */
 }
 

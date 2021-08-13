@@ -3,11 +3,9 @@
     <link rel="stylesheet" href="stylesheets/app.css">
   </head>
   <body>
+    <div class="svg-container"></div>
 
-    
-    <svg viewBox="0 0 100 100"></svg>
-
-    <form method="post" action="/file" enctype="multipart/form-data">
+    <form method="post" action="/upload" enctype="multipart/form-data">
       <label for="newickfile">Upload newick file</label>
       <input type="file" name="newickfile">
       <input type="submit" value="submit">

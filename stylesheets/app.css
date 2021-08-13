@@ -1,10 +1,4 @@
-div {
-	height: 300px;
-	width: 300px;
-	overflow: auto;
-}
-
-svg {
+.svg-container {
 	width: 500px;
 	height: 500px;
 	border:  1px solid blue;

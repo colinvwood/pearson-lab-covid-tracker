@@ -1,5 +1,9 @@
-//import { renderTree } from "./renderTree.js";
+import { renderTree } from "./renderTree.js";
 
+async function fetchText() {
+	let response = await fetch('http://localhost:8080/tree.nwk');
+	return await response.text();
+}
 
-var tree = SVG().addTo('svg');
-tree.path('M 10 10 V 25').attr({'stroke-width:': 10, 'stroke': '#000'});
+let newickString = await fetchText();
+renderTree(newickString);
