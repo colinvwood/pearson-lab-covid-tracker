@@ -6,6 +6,8 @@ const decoder = new TextDecoder();
 
 let renderFile;
 for await (const req of server) {
+
+  /*  home page  */
   if (req.url == '/') {
     renderFile = await Deno.readFile('./index.html');
     req.respond({
@@ -15,6 +17,8 @@ for await (const req of server) {
       body: decoder.decode(renderFile)
     });
   }
+  
+  /*  /upload route for uploading newick file  */
   if (req.url == '/upload' && req.method == 'POST') {
     const form = await multiParser(req);
     const newickString = decoder.decode(form.files.newickfile.content);
@@ -26,6 +30,8 @@ for await (const req of server) {
       })
     });
   }
+  
+  /*  serve the newick file for fetch() calls  */
   if (req.url == '/tree.nwk') {
     renderFile = await Deno.readFile('./tree.nwk');
     req.respond({
@@ -35,6 +41,8 @@ for await (const req of server) {
       body: decoder.decode(renderFile)
     });
   }
+  
+  /*  static serving for all files in the /stylesheets and /scripts directories  */
   if (req.url.includes('/stylesheets/')) {
     let filename = './' + req.url.substr(1, req.url.length);
     renderFile = await Deno.readFile('./stylesheets/app.css');
@@ -55,12 +63,16 @@ for await (const req of server) {
       body: decoder.decode(renderFile)
     });
   }
-  /*
-  else {
+
+  /*  serve the favicon  */
+  if (req.url == '/favicon.ico') {
+    const favicon = await Deno.readFile('./virus.svg');
     req.respond({
-      body: "Bad fetch..."
+      headers: new Headers({
+        'content-type': 'image/svg+xml'
+      }),
+      body: favicon
     });
   }
-  */
 }
 

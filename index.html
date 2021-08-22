@@ -1,17 +1,91 @@
 <!DOCTYPE html>
   <head>
     <link rel="stylesheet" href="stylesheets/app.css">
+    <title>Covid Tracker - Pearson Lab</title>
   </head>
   <body>
-    <div class="svg-container"></div>
+    <nav class="navbar">
+      <ul class="navbar-ul">
+        <li class="navbar-li navbar-hamburger-li">
+          <a class ="navbar-link" href="">Hamburger</a>
+        </li>
+        <li class="navbar-li navbar-home-li">
+          <a class ="navbar-link" href=""><h1>Pearson Lab Covid Tracker</h1></a>
+        </li>
+        <li class="navbar-li navbar-useful-li">
+          <a class ="navbar-link" href="">Other useful link...</a>
+        </li>
+      </ul>
+    </nav>
+    <main>
+      <div class="data-view cases-view">
+        <h2 class="data-view-header">
+          Cases
+        </h2>
+        <div class="chartjs-div-container">
+          <canvas id="cases-chart"></canvas>
+        </div>
 
-    <form method="post" action="/upload" enctype="multipart/form-data">
-      <label for="newickfile">Upload newick file</label>
-      <input type="file" name="newickfile">
-      <input type="submit" value="submit">
-    </form>
+      </div>
+      <div class="data-view variants-view">
+        <h2 class="data-view-header">
+          Variants
+        </h2>
 
+      </div>
+      <div class="data-view vaccines-view">
+        <h2 class="data-view-header">
+          Vaccines
+        </h2>
+
+      </div>
+      <div class="data-view tree-container">
+        <h2 class="data-view-header">Tree</h2>
+
+        <div class="tree-svg-container">
+
+          <div class="zoom-buttons">
+            <button type="button" class="zoom-in-button">
+              <p>Zoom in</p>
+            </button>
+            <button type="button" class="zoom-out-button">
+              <p>Zoom out</p>
+            </button>
+          </div>
+
+        </div>
+
+        <!--
+        <form method="post" action="/upload" enctype="multipart/form-data">
+          <label for="newickfile">Upload newick file</label>
+          <input type="file" name="newickfile">
+          <input type="submit" value="submit">
+        </form>
+        -->
+      </div>
+    </main>
+    <footer>
+      <ul class="footer-ul">
+        <li>
+          <a class="footer-link" href="">Footer link...</a>
+        </li>
+        <li>
+          <a class="footer-link" href="">Footer link...</a>
+        </li>
+        <li>
+          <a class="footer-link" href="">Footer link...</a>
+        </li>
+      </ul>
+    </footer>
+
+    
+    <!--
     <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.1.1/svg.min.js"></script>
-	  <script type="module" src="scripts/app.js"></script>
+    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.0/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script type="module" src="scripts/app.js"></script>
+    <script type="module" src="scripts/casesChart.js"></script>
+    <script type="module" src="scripts/panZoomTree.js"></script>
   </body>
 </html>
