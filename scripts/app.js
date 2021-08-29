@@ -1,5 +1,5 @@
 import { renderTree } from "./bundle.js";
-import { panZoomTree } from "./panZoomTree.js";
+import { makeTreePanZoomable } from "./makeTreePanZoomable.js";
 
 async function fetchText() {
 	let response = await fetch('http://localhost:8080/tree.nwk');
@@ -9,4 +9,4 @@ async function fetchText() {
 let newickString = await fetchText();
 renderTree(newickString);
 
-panZoomTree();
+makeTreePanZoomable();

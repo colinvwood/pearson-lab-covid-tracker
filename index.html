@@ -43,18 +43,19 @@
         <h2 class="data-view-header">Tree</h2>
 
         <div class="tree-svg-container">
+          <svg class="tree-svg"></svg>
 
-          <div class="zoom-buttons">
-            <button type="button" class="zoom-in-button">
-              <p>Zoom in</p>
-            </button>
-            <button type="button" class="zoom-out-button">
-              <p>Zoom out</p>
-            </button>
-          </div>
+          
 
         </div>
-
+        <div class="zoom-buttons">
+          <button type="button" class="zoom-in-button">
+            <p>Zoom in</p>
+          </button>
+          <button type="button" class="zoom-out-button">
+            <p>Zoom out</p>
+          </button>
+        </div>
         <!--
         <form method="post" action="/upload" enctype="multipart/form-data">
           <label for="newickfile">Upload newick file</label>
@@ -78,14 +79,9 @@
       </ul>
     </footer>
 
-    
-    <!--
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.1.1/svg.min.js"></script>
-    -->
+    <script src="https://unpkg.com/@panzoom/panzoom@4.4.1/dist/panzoom.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.0/chart.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script type="module" src="scripts/app.js"></script>
     <script type="module" src="scripts/casesChart.js"></script>
-    <script type="module" src="scripts/panZoomTree.js"></script>
   </body>
 </html>

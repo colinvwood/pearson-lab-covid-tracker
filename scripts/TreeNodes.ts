@@ -31,3 +31,28 @@ export class InternalTreeNode extends TreeNode {
 		super(parent, distanceFromParent, startPosition, endPosition);
 	}
 }
+
+
+/**
+ * Tests whether tree node object is an internal node
+ * @param treeNode 
+ * @returns - boolean indicating whether the tree node object is of type InternalTreeNode
+ */
+ export function isInternalTreeNode(treeNode: any): boolean {
+	if (treeNode.constructor.name == 'InternalTreeNode') {
+		return true;
+	}
+	return false;
+}
+
+/**
+ * Tests whether tree node object is a leaf node
+ * @param treeNode 
+ * @returns - boolean indicating whether the tree node object is of type LeafTreeNode
+ */
+export function isLeafTreeNode(treeNode: any): boolean {
+	if (treeNode.constructor.name == 'LeafTreeNode') {
+		return true;
+	}
+	return false;
+}

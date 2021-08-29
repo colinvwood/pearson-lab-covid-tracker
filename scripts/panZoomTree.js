@@ -1,127 +1,127 @@
+/**
+ * ABANDONED
+ */
+
 export function panZoomTree() {
 	const zoomInButton = document.querySelector(".zoom-in-button");
 	const zoomOutButton = document.querySelector(".zoom-out-button");
 
-	const svgElement = document.querySelector(".tree-svg-container svg");
+	const svgContainer = document.querySelector(".tree-svg-container");
+	const svgElement = document.querySelector(".tree-svg");
 
-	zoomInButton.addEventListener("click", function(){zoom(svgElement, "in")});
-	zoomOutButton.addEventListener("click", function(){zoom(svgElement, "out")});
+	zoomInButton.addEventListener("click", function(){zoom(svgElement, svgContainer, "in")});
+	zoomOutButton.addEventListener("click", function(){zoom(svgElement, svgContainer, "out")});
 
-	svgElement.addEventListener("mousedown", pan);
+	svgContainer.addEventListener("mousedown", pan);
+	svgContainer.ondragstart = function() { return false };
 	svgElement.ondragstart = function() { return false };
-	//svgElement.addEventListener("mousemove", pan);
-	//svgElement.addEventListener("mouseup", endPan);
-	//svgElement.addEventListener("mouseleave", endPan);
 
 }
 
 function pan(event) {
-	console.log("mouse down!", event);
-	console.log("initial x and y: ", event.clientX, event.clientY);
+	const svgContainer = document.querySelector(".tree-svg-container");
+	const svgElement = document.querySelector(".tree-svg");
 	
-	const svgElement = document.querySelector(".tree-svg-container svg");
+	let transformMatrix = window.getComputedStyle(svgElement).transform;
+	let transformMatrixArray = [];
+	for (const string of transformMatrix.split(",")) {
+		transformMatrixArray.push( parseFloat( string.replace(/[^\d.-]/g, '') ) );
+	}
 
 	// get inital click position
 	const initialX = event.clientX;
 	const initialY = event.clientY;
 
-	// get svg view box coordinates and dimensions
-	let viewBox = String( svgElement.getAttribute("viewBox") );
-	let viewBoxX = parseInt( viewBox.split(" ")[0] );
-	let viewBoxY = parseInt( viewBox.split(" ")[1] );
-	let viewBoxWidth = parseInt( viewBox.split(" ")[2] );
-	let viewBoxHeight = parseInt( viewBox.split(" ")[3] );
-
-	svgElement.addEventListener("mousemove", handleMouseMove);
-	svgElement.addEventListener("mouseup", handleMouseUp, {once: true});
-	svgElement.addEventListener("mouseleave", handleMouseLeave, {once: true});
+	svgContainer.addEventListener("mousemove", handleMouseMove);
+	svgContainer.addEventListener("mouseup", handleMouseUp, {once: true});
+	svgContainer.addEventListener("mouseleave", handleMouseLeave, {once: true});
 
 	function handleMouseMove(event) {
-		let xChange = 3 * (event.clientX - initialX);
-		let yChange = 3 * (event.clientY - initialY);
+		let xChange = event.clientX - initialX;
+		let yChange = event.clientY - initialY;
 
-		svgElement.setAttribute(
-			"viewBox",
-			`${viewBoxX - xChange} ${viewBoxY - yChange} ${viewBoxWidth} ${viewBoxHeight}`
-		);
+		console.log("matrix before pan: ", svgElement.style.transform);
+		// matrix has structure: matrix ( [scaleX], [skewY], [skewX], [scaleY], [translateX], [translateY] 
+		svgElement.style.transform = `matrix(
+			${transformMatrixArray[0]}, 
+			0,
+			0,
+			${transformMatrixArray[3]},
+			${transformMatrixArray[4] + xChange},
+			${transformMatrixArray[5] + yChange}
+		)`;
+
+		console.log("matrix after pan: ", svgElement.style.transform);
+		
 	}
 
 	function handleMouseUp(event) {
-		console.log("mouse up");
-		svgElement.removeEventListener("mousemove", handleMouseMove);
-		svgElement.removeEventListener("mouseleave", handleMouseLeave);
+		svgContainer.removeEventListener("mousemove", handleMouseMove);
+		svgContainer.removeEventListener("mouseleave", handleMouseLeave);
 	}
 	function handleMouseLeave(event) {
-		console.log("mouse leave");
-		svgElement.removeEventListener("mousemove", handleMouseMove);
-		svgElement.removeEventListener("mouseup", handleMouseUp);
+		svgContainer.removeEventListener("mousemove", handleMouseMove);
+		svgContainer.removeEventListener("mouseup", handleMouseUp);
 	}
 }
 
 
 
-function zoom(svgElement, direction) {
-	let viewBox = String( svgElement.getAttribute("viewBox") );
+function zoom(svgElement, svgContainer, direction) {
 
-	if (viewBox == "null") {
-		// view box defaults to svg height width
-		console.log("setting viewBox intially")
-		var svgWidth = parseInt( window.getComputedStyle(svgElement).width );
-		var svgHeight = parseInt( window.getComputedStyle(svgElement).height );
-		svgElement.setAttribute("viewBox", `0 0 ${svgWidth} ${svgHeight}`);
-
-		viewBox = String( svgElement.getAttribute("viewBox") );
+	// matrix has structure: matrix ( [scaleX], [skewY], [skewX], [scaleY], [translateX], [translateY] )
+	let transformMatrix = window.getComputedStyle(svgElement).transform;
+	let transformMatrixArray = [];
+	for (const string of transformMatrix.split(",")) {
+		transformMatrixArray.push( parseFloat( string.replace(/[^\d.-]/g, '') ) );
 	}
 	
-	// get view box coordinates
-	let viewBoxX = parseInt( viewBox.split(" ")[0] );
-	let viewBoxY = parseInt( viewBox.split(" ")[1] );
-	let viewBoxWidth = parseInt( viewBox.split(" ")[2] );
-	let viewBoxHeight = parseInt( viewBox.split(" ")[3] );
-	
-	// calculate center point of view box
-	let centerPoint = calcCenter(viewBoxX, viewBoxY, viewBoxX + viewBoxWidth, viewBoxY + viewBoxHeight);
+	// find coordinates of container element and tree (svg element)
+	const svgElementCoords = svgElement.getBoundingClientRect();
+	const svgContainerCoords = svgContainer.getBoundingClientRect();
 
-	let scaleFactor = 1.5;
+	const svgContainerCenter = findCenter(
+		svgContainerCoords.left,
+		svgContainerCoords.top,
+		svgContainerCoords.right,
+		svgContainerCoords.bottom
+	);
+
+
+	// scaleX and scaleY are always equal
+	let scale;
+	let scaleFactor = 1.2;
 	
+	let newSvgElementLeft, newSvgElementTop;
 	if (direction == "in") {
-		console.log("zooming in, center before: ", centerPoint);
-		console.log("coordinates before: (x1, y1, x2, y2) ", viewBoxX, viewBoxY, viewBoxX + viewBoxWidth, viewBoxY + viewBoxHeight);
-
-		viewBoxWidth /= scaleFactor;
-		viewBoxHeight /= scaleFactor;
-
-		viewBoxX = centerPoint[0] - (viewBoxWidth / 2);
-		viewBoxY = centerPoint[1] - (viewBoxHeight / 2);
-
-		console.log("coordinates after: (x1, y1, x2, y2) ", viewBoxX, viewBoxY, viewBoxX + viewBoxWidth, viewBoxY + viewBoxHeight);
-		console.log("center after: ", calcCenter(viewBoxX, viewBoxY, viewBoxX + viewBoxWidth, viewBoxY + viewBoxHeight));
-
-		svgElement.setAttribute(
-			"viewBox", 
-			`${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`
-		);
+		transformMatrixArray[0] === 0 ? scale = scaleFactor : scale = scaleFactor * transformMatrixArray[0];
 	}
-	else if (direction == "out") {;
-		console.log("zooming out, center before: ", centerPoint);
-		console.log("coordinates before: (x1, y1, x2, y2) ", viewBoxX, viewBoxY, viewBoxX + viewBoxWidth, viewBoxY + viewBoxHeight);
-		
-		viewBoxWidth *= scaleFactor;
-		viewBoxHeight *= scaleFactor;
-
-		viewBoxX = centerPoint[0] - (viewBoxWidth / 2);
-		viewBoxY = centerPoint[1] - (viewBoxHeight / 2);
-
-		console.log("coordinates after: (x1, y1, x2, y2) ", viewBoxX, viewBoxY, viewBoxX + viewBoxWidth, viewBoxY + viewBoxHeight);
-		console.log("center after: ", calcCenter(viewBoxX, viewBoxY, viewBoxX + viewBoxWidth, viewBoxY + viewBoxHeight));
-		
-		svgElement.setAttribute(
-			"viewBox", 
-			`${viewBoxX} ${viewBoxY} ${viewBoxWidth} ${viewBoxHeight}`
-		);
+	else if (direction == "out") {
+		transformMatrixArray[0] === 0 ? scale = scaleFactor : scale = (1 / scaleFactor) * transformMatrixArray[0];
 	}
+
+	
+	svgElement.style.transformOrigin = ``;
+
+	svgElement.style.transform = `matrix(
+		${scale}, 
+		0, 
+		0, 
+		${scale}, 
+		${transformMatrixArray[4]}, 
+		${transformMatrixArray[5]}
+	)`;
 }
 
-function calcCenter(x1, y1, x2, y2) {
-	return [(x2 + x1) / 2, (y2 + y1) / 2];
+
+function findCenter(x1, y1, x2, y2) {
+	return {
+		x: (x1 + x2) / 2,
+		y: (y1 + y2) / 2
+	};
+}
+
+
+function adjustTree(direction, svgElement) {
+
 }

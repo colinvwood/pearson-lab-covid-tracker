@@ -1,4 +1,9 @@
-import { InternalTreeNode, LeafTreeNode } from "./TreeNodes.ts";
+import { 
+	InternalTreeNode,
+	LeafTreeNode,
+	isInternalTreeNode,
+	isLeafTreeNode 
+} from "./TreeNodes.ts";
 
 export function parseNewickString(newickString: string): InternalTreeNode {
 
@@ -163,31 +168,6 @@ console.log(myNode.startPosition, myNode.endPosition, myNode.distanceFromParent,
 */
 
 
-/**
- * Tests whether tree node object is an internal node
- * @param treeNode 
- * @returns - boolean indicating whether the tree node object is of type InternalTreeNode
- */
-export function isInternalTreeNode(treeNode: any): boolean {
-	if (treeNode.constructor.name == 'InternalTreeNode') {
-		return true;
-	}
-	return false;
-}
-
-/**
- * Tests whether tree node object is a leaf node
- * @param treeNode 
- * @returns - boolean indicating whether the tree node object is of type LeafTreeNode
- */
-export function isLeafTreeNode(treeNode: any): boolean {
-	if (treeNode.constructor.name == 'LeafTreeNode') {
-		return true;
-	}
-	return false;
-}
-
-
 export function countLeafChildrenOfNode(treeNode: InternalTreeNode | LeafTreeNode): number {
 	let numLeafChildren: number = 0;
 
@@ -232,70 +212,3 @@ console.log(findMaxDepthOfTree(myRootNode));
 */
 
 
-export interface svgPosition {
-	xPos: number;
-	yPos: number;
-}
-
-export function drawChildren(
-	currentNode: InternalTreeNode | LeafTreeNode, 
-	currentPosition: svgPosition, 
-	drawObject: any,
-	heightOfLeafNode: number,
-	lengthOfTreeUnit: number
-): void {
-	//console.log("entering drawChildren(), currentNode: ", currentNode);
-	// draw node circle
-	let circleDiameter: number = 10;
-	let circle = drawObject.circle(circleDiameter).attr({
-		cx: currentPosition.xPos,
-		cy: currentPosition.yPos
-	});
-
-	if (isLeafTreeNode(currentNode)) {
-		//console.log("leaf detected");
-		// draw leaf node name, dont recurse
-		let text = drawObject.text((currentNode as LeafTreeNode).leafName).attr({
-			x: currentPosition.xPos + 10,
-			y: currentPosition.yPos + 5
-		});
-	}
-	else {
-		//console.log("internal node detected");
-		// count children nodes at current node
-		let childrenOfCurrentNode: number = countLeafChildrenOfNode(currentNode);
-
-		// initially at the top of the subtree
-		let subtreeOffset: number = currentPosition.yPos - (0.5 * childrenOfCurrentNode * heightOfLeafNode);
-
-		for (const child of (currentNode as InternalTreeNode).children) {
-			let childLeavesOfChild: number = countLeafChildrenOfNode(child);
-			let childYPosition: number = subtreeOffset + (0.5 * childLeavesOfChild * heightOfLeafNode);
-			let childXPosition: number = currentPosition.xPos + (child.distanceFromParent * lengthOfTreeUnit);
-			//console.log("current xpos: ", currentPosition.xPos, " current ypos: ", currentPosition.yPos);
-			//console.log("child xpos: ", childXPosition, " child ypos: ", childYPosition);
-
-			// draw to Y-position vertically
-			let yLine = drawObject.line(
-				currentPosition.xPos, 
-				currentPosition.yPos,
-				currentPosition.xPos,
-				childYPosition
-			).attr({stroke: "black", strokeWidth: 3});
-
-			// draw to X-position horizontally
-			let xLine = drawObject.line(
-				currentPosition.xPos, 
-				childYPosition,
-				childXPosition,
-				childYPosition
-			).attr({stroke: "black", strokeWidth: 1});
-
-			// recurse
-			drawChildren(child, {xPos: childXPosition, yPos: childYPosition}, drawObject, heightOfLeafNode, lengthOfTreeUnit);
-
-			// update offset
-			subtreeOffset += (childLeavesOfChild * heightOfLeafNode);
-		}
-	}
-}

@@ -1,14 +1,24 @@
 import { 
 	parseNewickString, 
 	countLeafChildrenOfNode,  
-	isLeafTreeNode,
 	findMaxDepthOfTree,
-	svgPosition,
-	drawChildren
-} from "./parseNewickString.ts";
+}
+from "./parseNewickString.ts";
 
-// skypack CDNs (see www.skypack.dev)
-import * as svg from "https://cdn.skypack.dev/@svgdotjs/svg.js";
+import {
+	InternalTreeNode,
+	LeafTreeNode,
+	isLeafTreeNode
+}
+from "./TreeNodes.ts";
+
+import {
+	drawLine,
+	drawCircle,
+	drawText
+}
+from "./svgUtils.js";
+
 
 /**
  * 
@@ -21,13 +31,21 @@ export function renderTree(newickString: string): void {
 
 	// find number of leaf nodes in tree, and thus height of svg viewport given padding inside each leaf
 	let numLeavesInTree: number = countLeafChildrenOfNode(rootNode);
-	let heightOfLeafNode: number = 50;
-	let svgViewPortHeight: number = heightOfLeafNode * numLeavesInTree + (2 * heightOfLeafNode); 
+
+	// get height and width of svg area for viewbox
+	let svgElement = document.querySelector(".tree-svg");
+	let svgElementStyle = window.getComputedStyle(svgElement as Element);
+	let svgElementWidth = parseFloat(svgElementStyle.width);
+	let svgElementHeight = parseFloat(svgElementStyle.height);
+	console.log("inside render tree, width, height: ", svgElementWidth, svgElementHeight);
+
+	// calculate height of single leaf node given padding
+	let xPadding: number = 1.05;
+	let heightOfLeafNode: number = svgElementHeight / ( xPadding * numLeavesInTree ); 
 
 	// find depth of the tree, and thus width of svg viewport given padding
 	let maxDepthOfTree: number = findMaxDepthOfTree(rootNode);
-	let lengthOfTreeUnit: number = 1;
-	let svgViewPortWidth: number = (maxDepthOfTree * lengthOfTreeUnit) + 350;
+	let lengthOfTreeUnit: number = (svgElementWidth - 300) / maxDepthOfTree;
 
 	// find y-coordinate of root to begin drawing, the (x,y) origin in the svg plane is top-left corner
 	let numLeavesAboveRoot: number;
@@ -42,34 +60,116 @@ export function renderTree(newickString: string): void {
 		numLeavesAboveRoot = countLeafChildrenOfNode(rootNode.children[0]);
 	}
 
-	let rootYCoordinate: number = numLeavesAboveRoot * heightOfLeafNode;
-	let rootXCoordinate: number = 25;
-
-	/**
-	 * The TREE LAYOUT is now such that:
-	 * 	- each leaf node is approx. 50 svg units (px) vertically apart 
-	 * 	- 1 unit of tree distance is equal to 1 svg unit
-	 * 	- there are 25 units worth of padding to left and right of the tree, and
-	 * 	  200 units left in which to put the names of leaf nodes (25 | tree | leaf names(200) | 25)
-	 */
-	
-	// create svg element
-	let draw = svg.SVG()
-		.addTo('.tree-svg-container');
-		//.size(svgViewPortWidth, svgViewPortHeight)
+	// set coordinates of root node, from which to begin drawing
+	let yPadding: number = 0.01;
+	let rootYCoordinate: number = xPadding * numLeavesAboveRoot * heightOfLeafNode;
+	let rootXCoordinate: number = yPadding * svgElementWidth;
 
 	// draw tree
 	drawChildren(rootNode, 
 		{xPos: rootXCoordinate, yPos: rootYCoordinate},
-		draw,
 		heightOfLeafNode,
-		lengthOfTreeUnit
+		lengthOfTreeUnit,
+		svgElement
 	);
 
 	console.log("max depth: ", maxDepthOfTree, " num leaves: ", numLeavesInTree);
-	console.log("height of tree: ", svgViewPortHeight, " width: ", svgViewPortWidth);
 	console.log("num leaves above root ", numLeavesAboveRoot);
+	console.log("height of one tree leaf: ", heightOfLeafNode);
+	console.log("length of one tree unit: ", lengthOfTreeUnit);
 	console.log("rootXPos: ", rootXCoordinate, " rootyPos: ", rootYCoordinate);
 	console.log(rootNode);
 
+}
+
+
+interface svgPosition {
+	xPos: number;
+	yPos: number;
+}
+
+/**
+ * Recursively draw all nodes in the tree
+ * 
+ * @param currentNode - node at current recursion level
+ * @param currentPosition - x and y positions of current node
+ * @param drawObject - reference to the SVG.js draw object
+ * @param heightOfLeafNode 
+ * @param lengthOfTreeUnit 
+ */
+function drawChildren(
+	currentNode: InternalTreeNode | LeafTreeNode, 
+	currentPosition: svgPosition, 
+	heightOfLeafNode: number,
+	lengthOfTreeUnit: number,
+	svgElement: any
+): void {
+
+	// used for dynamic circle and line sizes
+	let svgElementWidth: number = parseFloat( window.getComputedStyle(svgElement as Element).width);
+
+	// draw node circle
+	let circleRadius: number = 0.1;
+	drawCircle(
+		svgElement,
+		circleRadius,
+		currentPosition.xPos,
+		currentPosition.yPos,
+		"black"
+	);
+
+	if (isLeafTreeNode(currentNode)) {
+		// draw leaf node name, dont recurse
+		drawText(
+			svgElement,
+			currentPosition.xPos,
+			currentPosition.yPos,
+			`${0.005 * svgElementWidth}`,
+			0,
+			(currentNode as LeafTreeNode).leafName
+		);
+	}
+	else {
+		// count children nodes at current node
+		let childrenOfCurrentNode: number = countLeafChildrenOfNode(currentNode);
+
+		// initially at the top of the subtree
+		let subtreeOffset: number = currentPosition.yPos - (0.5 * childrenOfCurrentNode * heightOfLeafNode);
+
+		
+
+		for (const child of (currentNode as InternalTreeNode).children) {
+			let childLeavesOfChild: number = countLeafChildrenOfNode(child);
+			let childYPosition: number = subtreeOffset + (0.5 * childLeavesOfChild * heightOfLeafNode);
+			let childXPosition: number = currentPosition.xPos + (child.distanceFromParent * lengthOfTreeUnit);
+
+			// draw to Y-position vertically
+			drawLine(
+				svgElement,
+				currentPosition.xPos,
+				currentPosition.yPos,
+				currentPosition.xPos,
+				childYPosition,
+				"black",
+				"0.2"
+			);
+
+			// draw to X-position horizontally
+			drawLine(
+				svgElement,
+				currentPosition.xPos,
+				childYPosition,
+				childXPosition,
+				childYPosition,
+				"black",
+				"0.2"
+			);
+
+			// recurse
+			drawChildren(child, {xPos: childXPosition, yPos: childYPosition}, heightOfLeafNode, lengthOfTreeUnit, svgElement);
+
+			// update offset
+			subtreeOffset += (childLeavesOfChild * heightOfLeafNode);
+		}
+	}
 }
