@@ -1,4 +1,4 @@
-/*  broad convenience settings  */
+/*  convenience settings  */
 * {
 	box-sizing: border-box;
 	margin: 0;
@@ -20,6 +20,18 @@ a {
 }
 li {
 	list-style-type: none;
+}
+
+/*  general  */
+button, input {
+	background-color: rgb(197, 229, 255);
+	border: 2px solid lightgrey;
+	text-align: center;
+	border-radius: 5px;
+	padding: 5px 10px;
+}
+button:hover, input:hover, label:hover {
+	cursor: pointer;
 }
 
 
@@ -115,42 +127,41 @@ main {
 	height: 100%;
 	width: 100%;
 
-	position: relative;
-
 	overflow: hidden;
 
 	border: 2px solid lightgrey;
+	border-radius: 5px;
+
+	position: relative;
 }
 .tree-svg {
-	user-select: none;
 	height: 100%;
 	width: 100%;
-
-	transform: matrix(1, 0, 0, 1, 0, 0);
-
-	z-index: 1;
-
-	border: 1px solid orange;
 }
 .tree-svg text {
-	font-size: 0.1em;
+	font-size: 0.15em;
 }
 
-.zoom-buttons {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-
-	z-index: 2;
-
+.tree-controls {
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
+	justify-content: space-around;
+
+	width: 100%;
+
+	padding-top: 10px;
 }
-.zoom-in-button {
-	border: 1px solid red;
+.zoom-buttons {
+	display: flex;
+	flex-direction: row;
 }
-.zoom-out-button {
-	border: 1px solid red;
+.tree-form {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+.tree-form input {
+	height: 100%;
 }
 
 
@@ -174,4 +185,3 @@ footer {
 .footer-link:hover {
 	text-decoration: underline;
 }
-

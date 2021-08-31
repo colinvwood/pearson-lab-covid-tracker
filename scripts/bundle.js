@@ -163,15 +163,14 @@ function drawLine(svgElement, x1, y1, x2, y2, strokeColor, strokeWidth) {
     line.setAttribute("x2", x2);
     line.setAttribute("y2", y2);
     line.setAttribute("stroke", strokeColor);
-    line.setAttribute("strokeWidth", strokeWidth);
+    line.setAttribute("stroke-width", strokeWidth);
     svgElement.appendChild(line);
 }
-function drawCircle(svgElement, radius, x, y, strokeColor) {
+function drawCircle(svgElement, radius, x, y) {
     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     circle.setAttribute("r", radius);
     circle.setAttribute("cx", x);
     circle.setAttribute("cy", y);
-    circle.setAttribute("stroke", strokeColor);
     svgElement.appendChild(circle);
 }
 function drawText(svgElement, x, y, dx, dy, innerText) {
@@ -194,7 +193,7 @@ function renderTree1(newickString) {
     let xPadding = 1.05;
     let heightOfLeafNode = svgElementHeight / (xPadding * numLeavesInTree);
     let maxDepthOfTree = findMaxDepthOfTree(rootNode);
-    let lengthOfTreeUnit = (svgElementWidth - 300) / maxDepthOfTree;
+    let lengthOfTreeUnit = (svgElementWidth - 200) / maxDepthOfTree;
     let numLeavesAboveRoot;
     if (rootNode.children.length == 2 && isLeafTreeNode(rootNode.children[0])) {
         numLeavesAboveRoot = 1;
@@ -219,10 +218,11 @@ function renderTree1(newickString) {
 }
 function drawChildren(currentNode, currentPosition, heightOfLeafNode, lengthOfTreeUnit, svgElement) {
     let svgElementWidth = parseFloat(window.getComputedStyle(svgElement).width);
-    let circleRadius = 0.1;
-    drawCircle(svgElement, circleRadius, currentPosition.xPos, currentPosition.yPos, "black");
+    let svgElementHeight = parseFloat(window.getComputedStyle(svgElement).height);
     if (isLeafTreeNode(currentNode)) {
-        drawText(svgElement, currentPosition.xPos, currentPosition.yPos, `${0.005 * svgElementWidth}`, 0, currentNode.leafName);
+        let circleRadius = 0.75;
+        drawCircle(svgElement, circleRadius, currentPosition.xPos, currentPosition.yPos);
+        drawText(svgElement, currentPosition.xPos, currentPosition.yPos, `${0.002 * svgElementWidth}`, `${0.002 * svgElementHeight}`, currentNode.leafName);
     } else {
         let childrenOfCurrentNode = countLeafChildrenOfNode(currentNode);
         let subtreeOffset = currentPosition.yPos - 0.5 * childrenOfCurrentNode * heightOfLeafNode;
@@ -230,8 +230,8 @@ function drawChildren(currentNode, currentPosition, heightOfLeafNode, lengthOfTr
             let childLeavesOfChild = countLeafChildrenOfNode(child);
             let childYPosition = subtreeOffset + 0.5 * childLeavesOfChild * heightOfLeafNode;
             let childXPosition = currentPosition.xPos + child.distanceFromParent * lengthOfTreeUnit;
-            drawLine(svgElement, currentPosition.xPos, currentPosition.yPos, currentPosition.xPos, childYPosition, "black", "0.2");
-            drawLine(svgElement, currentPosition.xPos, childYPosition, childXPosition, childYPosition, "black", "0.2");
+            drawLine(svgElement, currentPosition.xPos, currentPosition.yPos, currentPosition.xPos, childYPosition, "black", `${svgElementWidth / 3000}`);
+            drawLine(svgElement, currentPosition.xPos, childYPosition, childXPosition, childYPosition, "black", `${svgElementWidth / 3000}`);
             drawChildren(child, {
                 xPos: childXPosition,
                 yPos: childYPosition

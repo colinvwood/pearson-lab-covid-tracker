@@ -44,25 +44,26 @@
 
         <div class="tree-svg-container">
           <svg class="tree-svg"></svg>
-
-          
-
         </div>
-        <div class="zoom-buttons">
-          <button type="button" class="zoom-in-button">
-            <p>Zoom in</p>
-          </button>
-          <button type="button" class="zoom-out-button">
-            <p>Zoom out</p>
-          </button>
+
+        <div class="tree-controls">
+          <div class="zoom-buttons">
+            <button type="button" class="zoom-in-button">
+              <p>Zoom in</p>
+            </button>
+            <button type="button" class="zoom-out-button">
+              <p>Zoom out</p>
+            </button>
+          </div>
+
+
+          <form class="tree-form" method="post" action="/upload" enctype="multipart/form-data">
+            <input class="tree-form-file-input" type="file" name="newickfile">
+            <input class="tree-form-submit-input" type="submit" value="Submit">
+          </form>
         </div>
-        <!--
-        <form method="post" action="/upload" enctype="multipart/form-data">
-          <label for="newickfile">Upload newick file</label>
-          <input type="file" name="newickfile">
-          <input type="submit" value="submit">
-        </form>
-        -->
+
+       
       </div>
     </main>
     <footer>

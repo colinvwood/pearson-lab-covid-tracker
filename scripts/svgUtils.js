@@ -7,19 +7,18 @@ export function drawLine(svgElement, x1, y1, x2, y2, strokeColor, strokeWidth) {
 	line.setAttribute("x2", x2);
 	line.setAttribute("y2", y2);
 	line.setAttribute("stroke", strokeColor);
-	line.setAttribute("strokeWidth", strokeWidth);
+	line.setAttribute("stroke-width", strokeWidth);
 
 	svgElement.appendChild(line);
 }
 
-export function drawCircle(svgElement, radius, x, y, strokeColor) {
+export function drawCircle(svgElement, radius, x, y) {
 	// must use svg namespace URI
 	const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
 
 	circle.setAttribute("r", radius);
 	circle.setAttribute("cx", x);
 	circle.setAttribute("cy", y);
-	circle.setAttribute("stroke", strokeColor);
 
 	svgElement.appendChild(circle);
 }

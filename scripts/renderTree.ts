@@ -45,7 +45,7 @@ export function renderTree(newickString: string): void {
 
 	// find depth of the tree, and thus width of svg viewport given padding
 	let maxDepthOfTree: number = findMaxDepthOfTree(rootNode);
-	let lengthOfTreeUnit: number = (svgElementWidth - 300) / maxDepthOfTree;
+	let lengthOfTreeUnit: number = (svgElementWidth - 200) / maxDepthOfTree;
 
 	// find y-coordinate of root to begin drawing, the (x,y) origin in the svg plane is top-left corner
 	let numLeavesAboveRoot: number;
@@ -106,26 +106,27 @@ function drawChildren(
 ): void {
 
 	// used for dynamic circle and line sizes
-	let svgElementWidth: number = parseFloat( window.getComputedStyle(svgElement as Element).width);
-
-	// draw node circle
-	let circleRadius: number = 0.1;
-	drawCircle(
-		svgElement,
-		circleRadius,
-		currentPosition.xPos,
-		currentPosition.yPos,
-		"black"
-	);
+	let svgElementWidth: number = parseFloat( window.getComputedStyle(svgElement as Element).width );
+	let svgElementHeight: number = parseFloat( window.getComputedStyle(svgElement as Element).height );
 
 	if (isLeafTreeNode(currentNode)) {
+
+		// draw node circle
+		let circleRadius: number = 0.75;
+		drawCircle(
+			svgElement,
+			circleRadius,
+			currentPosition.xPos,
+			currentPosition.yPos
+		);
+
 		// draw leaf node name, dont recurse
 		drawText(
 			svgElement,
 			currentPosition.xPos,
 			currentPosition.yPos,
-			`${0.005 * svgElementWidth}`,
-			0,
+			`${0.002 * svgElementWidth}`,
+			`${0.002 * svgElementHeight}`,
 			(currentNode as LeafTreeNode).leafName
 		);
 	}
@@ -151,7 +152,7 @@ function drawChildren(
 				currentPosition.xPos,
 				childYPosition,
 				"black",
-				"0.2"
+				`${svgElementWidth / 3000}`
 			);
 
 			// draw to X-position horizontally
@@ -162,7 +163,7 @@ function drawChildren(
 				childXPosition,
 				childYPosition,
 				"black",
-				"0.2"
+				`${svgElementWidth / 3000}`
 			);
 
 			// recurse
